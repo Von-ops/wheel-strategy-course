@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Calculator · Wheel Strategy Course</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#134e4a"><link rel="icon" href="assets/icon.svg"><link rel="apple-touch-icon" href="assets/icon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="stylesheet" href="css/styles.css"></head><body><header class="top"><a href="index.html">Wheel Strategy Course</a><nav class="mods"><a href="index.html">Home</a><a href="m1.html">Module 1</a><a href="m2.html">Module 2</a><a href="m3.html">Module 3</a><a href="m4.html">Module 4</a><a href="m5.html">Module 5</a><a href="m6.html">Module 6</a><a href="calculator.html" class=on>Calculator</a><a href="drill.html">Drill</a><a href="resources.html">Resources</a></nav></header><main><h1>Covered call and cash-secured put calculator</h1><p class="lead">Practice the math. Numbers stay on this device and are not quotes or trade signals.</p>
+<div class="card"><label>Strategy</label><select id="mode"><option value="cc">Covered call</option><option value="csp">Cash-secured put</option></select>
+<label>Stock price now ($)</label><input id="s" type="number" step="0.01" value="100"><label>Strike ($)</label><input id="k" type="number" step="0.5" value="110">
+<label>Premium per share ($)</label><input id="p" type="number" step="0.01" value="2"><label>Contracts</label><input id="n" type="number" step="1" min="1" value="1">
+<label>Days to expiration</label><input id="d" type="number" step="1" min="1" value="35"><label>Stock price at expiration, for a what-if ($)</label><input id="t" type="number" step="0.01" value="115">
+<label>Account value, to check your 1–2% rule ($, optional)</label><input id="nav" type="number" step="100" placeholder="e.g. 100000"></div>
+<div class="card out" id="out"></div>
+<div class="note">Assumes held to expiration with no early assignment, costs, taxes or dividends.</div>
+<script>
+function f(x){return x.toLocaleString(undefined,{style:'currency',currency:'USD'})}
+function c(){var m=mode.value,S=+s.value,K=+k.value,P=+p.value,N=Math.max(1,Math.round(+n.value)),D=Math.max(1,+d.value),T=+t.value,A=+nav.value,sh=N*100;
+var cr=P*sh,cap=(m=='cc'?S:K)*sh,be=(m=='cc'?S:K)-P,worst=be*sh,ret=cr/cap,ann=ret*365/D;
+var pl=m=='cc'?(Math.min(T,K)-S+P)*sh:(P-Math.max(K-T,0))*sh;
+var asg=m=='cc'?(T>K?'Shares called away at '+f(K):'Call expires; you keep the shares'):(T<K?'You buy '+sh+' shares at '+f(K):'Put expires; cash released');
+var maxp=m=='cc'?(K-S+P)*sh:cr;
+var rows=[['Premium collected',f(cr)],[m=='cc'?'Share value covered':'Cash collateral',f(cap)],['Breakeven per share',f(be)],['Return on '+(m=='cc'?'shares':'collateral'),(ret*100).toFixed(2)+'%'],['Simple annualized',(ann*100).toFixed(1)+'%'],['Max profit at expiration',f(maxp)],['Worst case if stock goes to $0',f(worst)],['What-if outcome',asg],['What-if total P/L',f(pl)],['Buy back at 50–70% profit for',f(cr*.5)+' to '+f(cr*.3)]];
+if(A>0){var lim=A*.02;rows.push(['Your 2% max-loss limit',f(lim)+(worst>lim?' (worst case is over it)':' (fits)')])}
+out.innerHTML=rows.map(function(r){return '<div><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join('')}
+mode.onchange=function(){if(mode.value=='csp'){s.value=52;k.value=50;p.value=1;t.value=42;d.value=30}else{s.value=100;k.value=110;p.value=2;t.value=115;d.value=35}c()};
+document.querySelectorAll('input').forEach(function(i){i.oninput=c});c();
+</script></main><footer>Educational material, not financial advice. Worked examples use made-up numbers to teach the math; they are not live quotes or trade instructions. Videos and outside links belong to their creators. Progress and drill notes save only in this browser.</footer><script src="js/app.js"></script></body></html>
